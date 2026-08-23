@@ -5,4 +5,4 @@
 - [x] Provide REST APIs for campaign lifecycle, attestation, escalation, closure, listing, and audit retrieval.
 - [x] Add automated tests for success, validation, manager authority, invalid transitions, escalation, closure, and persistence callbacks.
 - [x] Add CI and the required structured README with five Mermaid diagrams and owner content.
-- [ ] Validate LAN operation, publish publicly, independently verify visibility, and update the master ledger.
+- [x] Validate LAN operation, publish publicly, independently verify visibility, and update the master ledger.
