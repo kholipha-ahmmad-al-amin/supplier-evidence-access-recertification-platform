@@ -1,0 +1,16 @@
+import express from 'express';
+import { join } from 'node:path';
+import { RecertificationService } from './domain.mjs';
+import { JsonRecertificationStore } from './store.mjs';
+const store = new JsonRecertificationStore(process.env.DATA_FILE || join(process.cwd(), 'data', 'recertifications.json'));
+const service = new RecertificationService(store.load(), (state) => store.save(state));
+const app = express(); app.use(express.json());
+const route = (handler) => (request, response) => { try { handler(request, response); } catch (error) { response.status(400).json({ error: error.message }); } };
+app.get('/health', (_request, response) => response.json({ status: 'ok', service: 'supplier-evidence-access-recertification-platform' }));
+app.get('/campaigns', (_request, response) => response.json(service.state.campaigns));
+app.get('/campaigns/:id/audit', route((request, response) => response.json(service.auditFor(request.params.id))));
+app.post('/campaigns', route((request, response) => response.status(201).json(service.launch(request.body))));
+app.post('/campaigns/:id/assignments/:assignmentId/attest', route((request, response) => response.json(service.attestation(request.params.id, request.params.assignmentId, request.body.actor, request.body.decision, request.body.rationale))));
+app.post('/campaigns/expire-due', route((request, response) => response.json(service.escalateDue(request.body.actor))));
+app.post('/campaigns/:id/close', route((request, response) => response.json(service.close(request.params.id, request.body.actor))));
+app.listen(process.env.PORT || 55200, '0.0.0.0');

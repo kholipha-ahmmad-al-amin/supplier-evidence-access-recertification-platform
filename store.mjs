@@ -1,0 +1,3 @@
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+export class JsonRecertificationStore { constructor(filePath) { this.filePath = filePath; } load() { try { const state = JSON.parse(readFileSync(this.filePath, 'utf8')); return { campaigns: state.campaigns ?? [], audit: state.audit ?? [] }; } catch (error) { if (error.code === 'ENOENT') return { campaigns: [], audit: [] }; throw error; } } save(state) { mkdirSync(dirname(this.filePath), { recursive: true }); const temporary = `${this.filePath}.tmp`; writeFileSync(temporary, JSON.stringify(state, null, 2), 'utf8'); renameSync(temporary, this.filePath); } }
